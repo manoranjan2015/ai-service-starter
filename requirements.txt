@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-dotenv
+openai
+langchain-core
+pytest
+httpx
+faiss-cpu
+numpy
+xlrd
+openpyxl
+pandas
