@@ -382,27 +382,87 @@ Good next improvements:
 
 ## Setup
 
+Clone the repository:
+
 ```bash
-cd /Users/mano/Documents/Work/code/ai-service-starter
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+git clone https://github.com/manoranjan2015/ai-service-starter.git
+cd ai-service-starter
+```
+
+Create your environment file:
+
+```bash
 cp .env.example .env
 ```
 
 Update `.env` with your real `OPENAI_API_KEY`.
 
-## Run API
+### Option 1: Run With Docker
+
+This is the recommended path for a fresh checkout because it starts all services together.
+
+```bash
+docker compose up --build
+```
+
+Open:
+
+```text
+AI service       http://127.0.0.1:8000/docs
+Student service  http://127.0.0.1:8001/docs
+```
+
+Try the main chat API:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conversation_id": "demo",
+    "message": "What should I revise this weekend based on last week lessons, upcoming exams, and recent scores?",
+    "mode": "detailed"
+  }'
+```
+
+Stop services:
+
+```bash
+docker compose down
+```
+
+### Option 2: Run Locally
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Start the student service in one terminal:
+
+```bash
+source .venv/bin/activate
+uvicorn student_service.student_data_server:app --reload --port 8001
+```
+
+Start the AI service in another terminal:
 
 ```bash
 source .venv/bin/activate
 uvicorn ai_service.app:app --reload --port 8000
 ```
 
-Open:
+Open the AI service:
 
 ```text
 http://127.0.0.1:8000/docs
+```
+
+The MCP server can also be started separately for MCP demonstrations:
+
+```bash
+pip install -r requirements-mcp.txt
+python -m mcp_service.mcp_server
 ```
 
 ## Service Layout
@@ -419,46 +479,12 @@ mcp_service/      MCP server and tools that the agent will use to reach external
 documents/        RAG source documents
 ```
 
-Run the student backend service separately:
-
-```bash
-uvicorn student_service.student_data_server:app --reload --port 8001
-```
-
-Run the MCP server separately:
-
-```bash
-python -m mcp_service.mcp_server
-```
-
-## Run With Docker
-
-Build and run the services:
-
-```bash
-docker compose up --build
-```
-
-Services:
-
-```text
-AI service       http://127.0.0.1:8000/docs
-Student service  http://127.0.0.1:8001/docs
-MCP service      runs as a stdio MCP process inside its container
-```
-
-Run only one service:
+Run only one Docker service:
 
 ```bash
 docker compose up --build ai-service
 docker compose up --build student-service
 docker compose up --build mcp-service
-```
-
-Stop services:
-
-```bash
-docker compose down
 ```
 
 The Compose file reads `OPENAI_API_KEY` and model settings from your shell or `.env`.
