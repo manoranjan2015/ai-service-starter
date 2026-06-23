@@ -87,6 +87,263 @@ Agent Orchestrator
         |-- recent scores
 ```
 
+## Service Layout
+
+```text
+ai_service/
+  app.py          Main AI API entrypoint
+  agent/          Agent orchestration, tool choice, prompt modes, external fallback
+  rag/            Document loading, embeddings, vector store, retrieval, reranking
+  memory/         Conversation history
+  llm/            OpenAI model calls
+student_service/  Separate single-student backend service with course/exam/score data
+mcp_service/      MCP server and tools that the agent will use to reach external systems
+documents/        RAG source documents
+```
+
+Run only one Docker service:
+
+```bash
+docker compose up --build ai-service
+docker compose up --build student-service
+docker compose up --build mcp-service
+```
+
+The Compose file reads `OPENAI_API_KEY` and model settings from your shell or `.env`.
+
+## AI Concepts To Showcase
+
+- AI service wrapper
+- Prompt templates
+- Prompt modes
+- Prompt versioning
+- Conversation memory
+- Document ingestion
+- Embeddings
+- Vector search
+- RAG
+- Citations
+- Reranking
+- Retrieval quality signals
+- Agent tool choice
+- Tool trace
+- MCP tool calls
+- Structured tool outputs
+- Personalized summarization
+- Error handling and fallback
+- Tests with mocked model/tool calls
+
+## Current Implementation Status
+
+Already present in the project:
+
+- FastAPI service
+- `/chat` as the user-facing agent endpoint
+- `/rag/search`
+- `/agent/run`
+- prompt modes
+- conversation memory
+- OpenAI wrapper
+- RAG with FAISS over Markdown, text, and Excel files
+- reranking
+- MCP server with student data tools
+- MCP client abstraction inside the AI service
+- separate single-student data service
+- sample study tracker RAG documents
+- agent tool trace with MCP results
+- tests
+
+Good next improvements:
+
+- Add answerability/confidence metadata.
+- Add persistent storage for memory and student records.
+- Replace the in-process MCP adapter with a real MCP transport client.
+- Improve `/rag/search` with citations and rerank details.
+
+## Setup
+
+Clone the repository:
+
+```bash
+git clone https://github.com/manoranjan2015/ai-service-starter.git
+cd ai-service-starter
+```
+
+Create your environment file:
+
+```bash
+cp .env.example .env
+```
+
+Update `.env` with your real `OPENAI_API_KEY`.
+
+### Option 1: Run With Docker
+
+This is the recommended path for a fresh checkout because it starts all services together.
+
+```bash
+docker compose up --build
+```
+
+Open:
+
+```text
+AI service       http://127.0.0.1:8000/docs
+Student service  http://127.0.0.1:8001/docs
+```
+
+Try the main chat API:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conversation_id": "demo",
+    "message": "What should I revise this weekend based on last week lessons, upcoming exams, and recent scores?",
+    "mode": "detailed"
+  }'
+```
+
+Stop services:
+
+```bash
+docker compose down
+```
+
+### Option 2: Run Locally
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Start the student service in one terminal:
+
+```bash
+source .venv/bin/activate
+uvicorn student_service.student_data_server:app --reload --port 8001
+```
+
+Start the AI service in another terminal:
+
+```bash
+source .venv/bin/activate
+uvicorn ai_service.app:app --reload --port 8000
+```
+
+Open the AI service:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The MCP server can also be started separately for MCP demonstrations:
+
+```bash
+pip install -r requirements-mcp.txt
+python -m mcp_service.mcp_server
+```
+
+## Manual Test Cases
+
+Use these checks after starting the services with Docker or local commands.
+
+### 1. Check Services
+
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8001/health
+```
+
+Expected result: both services return `status: ok`.
+
+### 2. Inspect Student Data
+
+```bash
+curl http://127.0.0.1:8001/student
+curl http://127.0.0.1:8001/student/courses
+curl http://127.0.0.1:8001/student/exams
+curl http://127.0.0.1:8001/student/scores
+```
+
+This shows the structured data that MCP tools expose to the agent.
+
+### 3. Ask Student Questions Through `/chat`
+
+Exam query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-exam","message":"When is my next exam?","mode":"simple"}'
+```
+
+Score query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-score","message":"What was my score in the last class test?","mode":"simple"}'
+```
+
+RAG query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-rag","message":"What was taught last week?","mode":"detailed"}'
+```
+
+Combined RAG + MCP query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-plan","message":"What should I revise this weekend based on last week lessons, upcoming exams, and recent scores?","mode":"detailed"}'
+```
+
+Follow-up memory query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-plan","message":"Make that revision plan shorter.","mode":"summary"}'
+```
+
+In the response, inspect:
+
+```text
+answer       -> final model answer
+citations    -> RAG document chunks used
+steps        -> agent trace
+mcp_results  -> structured data returned through MCP tools
+```
+
+### 4. Inspect Agent Trace Directly
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/run \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"debug-1","task":"What should I revise this weekend?","mode":"research"}'
+```
+
+Look for trace steps such as `retrieve_context`, `choose_mcp_tools`, `call_mcp_tool`, and `final_answer`.
+
+### 5. Inspect RAG Retrieval
+
+```bash
+curl "http://127.0.0.1:8000/rag/search?query=linear%20equations"
+```
+
+This shows what the local RAG layer retrieves from files in `documents/`.
+
+## Test
+
+```bash
+.venv/bin/python -m pytest
+```
+
 ## User Scenarios
 
 ### 1. Ask What Was Taught
@@ -329,263 +586,6 @@ If you change RAG documents, restart the AI service with indexing enabled:
 
 ```bash
 AUTO_INDEX_ON_STARTUP=true docker compose up --build ai-service
-```
-
-## AI Concepts To Showcase
-
-- AI service wrapper
-- Prompt templates
-- Prompt modes
-- Prompt versioning
-- Conversation memory
-- Document ingestion
-- Embeddings
-- Vector search
-- RAG
-- Citations
-- Reranking
-- Retrieval quality signals
-- Agent tool choice
-- Tool trace
-- MCP tool calls
-- Structured tool outputs
-- Personalized summarization
-- Error handling and fallback
-- Tests with mocked model/tool calls
-
-## Current Implementation Status
-
-Already present in the project:
-
-- FastAPI service
-- `/chat` as the user-facing agent endpoint
-- `/rag/search`
-- `/agent/run`
-- prompt modes
-- conversation memory
-- OpenAI wrapper
-- RAG with FAISS over Markdown, text, and Excel files
-- reranking
-- MCP server with student data tools
-- MCP client abstraction inside the AI service
-- separate single-student data service
-- sample study tracker RAG documents
-- agent tool trace with MCP results
-- tests
-
-Good next improvements:
-
-- Add answerability/confidence metadata.
-- Add persistent storage for memory and student records.
-- Replace the in-process MCP adapter with a real MCP transport client.
-- Improve `/rag/search` with citations and rerank details.
-
-## Setup
-
-Clone the repository:
-
-```bash
-git clone https://github.com/manoranjan2015/ai-service-starter.git
-cd ai-service-starter
-```
-
-Create your environment file:
-
-```bash
-cp .env.example .env
-```
-
-Update `.env` with your real `OPENAI_API_KEY`.
-
-### Option 1: Run With Docker
-
-This is the recommended path for a fresh checkout because it starts all services together.
-
-```bash
-docker compose up --build
-```
-
-Open:
-
-```text
-AI service       http://127.0.0.1:8000/docs
-Student service  http://127.0.0.1:8001/docs
-```
-
-Try the main chat API:
-
-```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-    "conversation_id": "demo",
-    "message": "What should I revise this weekend based on last week lessons, upcoming exams, and recent scores?",
-    "mode": "detailed"
-  }'
-```
-
-Stop services:
-
-```bash
-docker compose down
-```
-
-### Option 2: Run Locally
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Start the student service in one terminal:
-
-```bash
-source .venv/bin/activate
-uvicorn student_service.student_data_server:app --reload --port 8001
-```
-
-Start the AI service in another terminal:
-
-```bash
-source .venv/bin/activate
-uvicorn ai_service.app:app --reload --port 8000
-```
-
-Open the AI service:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-The MCP server can also be started separately for MCP demonstrations:
-
-```bash
-pip install -r requirements-mcp.txt
-python -m mcp_service.mcp_server
-```
-
-## Explore The Project
-
-Use these checks after starting the services with Docker or local commands.
-
-### 1. Check Services
-
-```bash
-curl http://127.0.0.1:8000/health
-curl http://127.0.0.1:8001/health
-```
-
-Expected result: both services return `status: ok`.
-
-### 2. Inspect Student Data
-
-```bash
-curl http://127.0.0.1:8001/student
-curl http://127.0.0.1:8001/student/courses
-curl http://127.0.0.1:8001/student/exams
-curl http://127.0.0.1:8001/student/scores
-```
-
-This shows the structured data that MCP tools expose to the agent.
-
-### 3. Ask Student Questions Through `/chat`
-
-Exam query:
-
-```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"conversation_id":"demo-exam","message":"When is my next exam?","mode":"simple"}'
-```
-
-Score query:
-
-```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"conversation_id":"demo-score","message":"What was my score in the last class test?","mode":"simple"}'
-```
-
-RAG query:
-
-```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"conversation_id":"demo-rag","message":"What was taught last week?","mode":"detailed"}'
-```
-
-Combined RAG + MCP query:
-
-```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"conversation_id":"demo-plan","message":"What should I revise this weekend based on last week lessons, upcoming exams, and recent scores?","mode":"detailed"}'
-```
-
-Follow-up memory query:
-
-```bash
-curl -X POST http://127.0.0.1:8000/chat \
-  -H "Content-Type: application/json" \
-  -d '{"conversation_id":"demo-plan","message":"Make that revision plan shorter.","mode":"summary"}'
-```
-
-In the response, inspect:
-
-```text
-answer       -> final model answer
-citations    -> RAG document chunks used
-steps        -> agent trace
-mcp_results  -> structured data returned through MCP tools
-```
-
-### 4. Inspect Agent Trace Directly
-
-```bash
-curl -X POST http://127.0.0.1:8000/agent/run \
-  -H "Content-Type: application/json" \
-  -d '{"conversation_id":"debug-1","task":"What should I revise this weekend?","mode":"research"}'
-```
-
-Look for trace steps such as `retrieve_context`, `choose_mcp_tools`, `call_mcp_tool`, and `final_answer`.
-
-### 5. Inspect RAG Retrieval
-
-```bash
-curl "http://127.0.0.1:8000/rag/search?query=linear%20equations"
-```
-
-This shows what the local RAG layer retrieves from files in `documents/`.
-
-## Service Layout
-
-```text
-ai_service/
-  app.py          Main AI API entrypoint
-  agent/          Agent orchestration, tool choice, prompt modes, external fallback
-  rag/            Document loading, embeddings, vector store, retrieval, reranking
-  memory/         Conversation history
-  llm/            OpenAI model calls
-student_service/  Separate single-student backend service with course/exam/score data
-mcp_service/      MCP server and tools that the agent will use to reach external systems
-documents/        RAG source documents
-```
-
-Run only one Docker service:
-
-```bash
-docker compose up --build ai-service
-docker compose up --build student-service
-docker compose up --build mcp-service
-```
-
-The Compose file reads `OPENAI_API_KEY` and model settings from your shell or `.env`.
-
-## Test
-
-```bash
-.venv/bin/python -m pytest
 ```
 
 ## Recommended Next Build Order
