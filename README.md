@@ -465,6 +465,99 @@ pip install -r requirements-mcp.txt
 python -m mcp_service.mcp_server
 ```
 
+## Explore The Project
+
+Use these checks after starting the services with Docker or local commands.
+
+### 1. Check Services
+
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8001/health
+```
+
+Expected result: both services return `status: ok`.
+
+### 2. Inspect Student Data
+
+```bash
+curl http://127.0.0.1:8001/student
+curl http://127.0.0.1:8001/student/courses
+curl http://127.0.0.1:8001/student/exams
+curl http://127.0.0.1:8001/student/scores
+```
+
+This shows the structured data that MCP tools expose to the agent.
+
+### 3. Ask Student Questions Through `/chat`
+
+Exam query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-exam","message":"When is my next exam?","mode":"simple"}'
+```
+
+Score query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-score","message":"What was my score in the last class test?","mode":"simple"}'
+```
+
+RAG query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-rag","message":"What was taught last week?","mode":"detailed"}'
+```
+
+Combined RAG + MCP query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-plan","message":"What should I revise this weekend based on last week lessons, upcoming exams, and recent scores?","mode":"detailed"}'
+```
+
+Follow-up memory query:
+
+```bash
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"demo-plan","message":"Make that revision plan shorter.","mode":"summary"}'
+```
+
+In the response, inspect:
+
+```text
+answer       -> final model answer
+citations    -> RAG document chunks used
+steps        -> agent trace
+mcp_results  -> structured data returned through MCP tools
+```
+
+### 4. Inspect Agent Trace Directly
+
+```bash
+curl -X POST http://127.0.0.1:8000/agent/run \
+  -H "Content-Type: application/json" \
+  -d '{"conversation_id":"debug-1","task":"What should I revise this weekend?","mode":"research"}'
+```
+
+Look for trace steps such as `retrieve_context`, `choose_mcp_tools`, `call_mcp_tool`, and `final_answer`.
+
+### 5. Inspect RAG Retrieval
+
+```bash
+curl "http://127.0.0.1:8000/rag/search?query=linear%20equations"
+```
+
+This shows what the local RAG layer retrieves from files in `documents/`.
+
 ## Service Layout
 
 ```text
