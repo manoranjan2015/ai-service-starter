@@ -609,6 +609,24 @@ If you change RAG documents, restart the AI service with indexing enabled:
 AUTO_INDEX_ON_STARTUP=true docker compose up --build ai-service
 ```
 
+## Troubleshooting
+
+If the chat answer says it cannot access the student information system, verify that both services are running:
+
+```bash
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8001/health
+```
+
+When running through Docker, rebuild after config changes:
+
+```bash
+docker compose down
+docker compose up --build
+```
+
+The AI service must be able to reach the student service at `http://student-service:8001` inside Docker. This is configured in `docker-compose.yml` through `STUDENT_SERVICE_BASE_URL`.
+
 ## Recommended Next Build Order
 
 Implemented:

@@ -13,6 +13,8 @@ services:
       OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
       PROMPT_VERSION: ${PROMPT_VERSION:-v1}
       AUTO_INDEX_ON_STARTUP: ${AUTO_INDEX_ON_STARTUP:-false}
+      STUDENT_SERVICE_BASE_URL: http://student-service:8001
+      STUDENT_SERVICE_TIMEOUT_SECONDS: 5
     volumes:
       - ./documents:/app/documents:ro
     depends_on:
