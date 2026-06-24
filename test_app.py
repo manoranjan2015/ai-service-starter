@@ -29,6 +29,15 @@ def test_service_index():
     assert "POST /chat" in body["endpoints"]
     assert "POST /agent/run" in body["endpoints"]
     assert "GET /rag/search" in body["endpoints"]
+    assert "GET /ui/chat.html" in body["endpoints"]
+
+
+def test_chat_ui_is_served():
+    response = client.get("/ui/chat.html")
+
+    assert response.status_code == 200
+    assert "AI Student Study Tracker" in response.text
+    assert "/chat" in response.text
 
 
 def test_health():

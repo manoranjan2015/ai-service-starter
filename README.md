@@ -188,11 +188,18 @@ docker compose up --build
 Open:
 
 ```text
+Chat UI          http://127.0.0.1:8000/ui/chat.html
 AI service       http://127.0.0.1:8000/docs
 Student service  http://127.0.0.1:8001/docs
 ```
 
-Try the main chat API:
+Try the chat UI in your browser:
+
+```text
+http://127.0.0.1:8000/ui/chat.html
+```
+
+Or call the chat API directly:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/chat \
@@ -232,7 +239,13 @@ source .venv/bin/activate
 uvicorn ai_service.app:app --reload --port 8000
 ```
 
-Open the AI service:
+Open the chat UI:
+
+```text
+http://127.0.0.1:8000/ui/chat.html
+```
+
+Open the AI service docs:
 
 ```text
 http://127.0.0.1:8000/docs
@@ -249,7 +262,15 @@ python -m mcp_service.mcp_server
 
 Use these checks after starting the services with Docker or local commands.
 
-### 1. Check Services
+### 1. Open The Chat UI
+
+```text
+http://127.0.0.1:8000/ui/chat.html
+```
+
+Use the sample question buttons to test exam, score, RAG, combined RAG + MCP, and memory follow-up flows.
+
+### 2. Check Services
 
 ```bash
 curl http://127.0.0.1:8000/health
@@ -258,7 +279,7 @@ curl http://127.0.0.1:8001/health
 
 Expected result: both services return `status: ok`.
 
-### 2. Inspect Student Data
+### 3. Inspect Student Data
 
 ```bash
 curl http://127.0.0.1:8001/student
@@ -269,7 +290,7 @@ curl http://127.0.0.1:8001/student/scores
 
 This shows the structured data that MCP tools expose to the agent.
 
-### 3. Ask Student Questions Through `/chat`
+### 4. Ask Student Questions Through `/chat`
 
 Exam query:
 
@@ -320,7 +341,7 @@ steps        -> agent trace
 mcp_results  -> structured data returned through MCP tools
 ```
 
-### 4. Inspect Agent Trace Directly
+### 5. Inspect Agent Trace Directly
 
 ```bash
 curl -X POST http://127.0.0.1:8000/agent/run \
@@ -330,7 +351,7 @@ curl -X POST http://127.0.0.1:8000/agent/run \
 
 Look for trace steps such as `retrieve_context`, `choose_mcp_tools`, `call_mcp_tool`, and `final_answer`.
 
-### 5. Inspect RAG Retrieval
+### 6. Inspect RAG Retrieval
 
 ```bash
 curl "http://127.0.0.1:8000/rag/search?query=linear%20equations"

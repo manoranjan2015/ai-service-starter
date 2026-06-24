@@ -1,5 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from ai_service.models import (
     AgentRequest,
     AgentResponse,
@@ -45,6 +47,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/ui", StaticFiles(directory="ui"), name="ui")
+
 @app.get("/", response_model=ServiceIndexResponse)
 def service_index():
     return ServiceIndexResponse(
@@ -60,6 +72,7 @@ def service_index():
             "GET /chat/{conversation_id}/history",
             "DELETE /chat/{conversation_id}",
             "GET /rag/search",
+            "GET /ui/chat.html",
         ],
     )
 
