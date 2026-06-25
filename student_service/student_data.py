@@ -1,92 +1,39 @@
-STUDENT_PROFILE = {
-    "student_id": "STU-101",
-    "name": "Aarav Sharma",
-    "grade": "8",
-    "school": "Demo Public School",
-    "academic_year": "2026",
-}
+import json
+from functools import lru_cache
+from pathlib import Path
+from typing import Dict
 
-STUDENT_COURSES = [
-    {
-        "subject": "Mathematics",
-        "teacher": "Ms. Rao",
-        "current_chapter": "Linear Equations",
-        "schedule": "Mon/Wed/Fri",
-    },
-    {
-        "subject": "Science",
-        "teacher": "Mr. Iyer",
-        "current_chapter": "Force and Pressure",
-        "schedule": "Tue/Thu",
-    },
-    {
-        "subject": "English",
-        "teacher": "Ms. Thomas",
-        "current_chapter": "Essay Writing",
-        "schedule": "Mon/Thu",
-    },
-]
 
-UPCOMING_EXAMS = [
-    {
-        "subject": "Mathematics",
-        "date": "2026-06-28",
-        "topic": "Linear Equations",
-        "exam_type": "Unit Test",
-    },
-    {
-        "subject": "Science",
-        "date": "2026-07-02",
-        "topic": "Force and Pressure",
-        "exam_type": "Class Test",
-    },
-]
+STUDENT_DATA_PATH = Path(__file__).resolve().parent / "data" / "student.json"
 
-RECENT_SCORES = [
-    {
-        "subject": "Mathematics",
-        "assessment": "Class Test 3",
-        "score": 72,
-        "max_score": 100,
-        "teacher_remark": "Needs more practice with word problems.",
-    },
-    {
-        "subject": "Science",
-        "assessment": "Worksheet 5",
-        "score": 18,
-        "max_score": 25,
-        "teacher_remark": "Good conceptual understanding, revise definitions.",
-    },
-    {
-        "subject": "English",
-        "assessment": "Essay Draft",
-        "score": 15,
-        "max_score": 20,
-        "teacher_remark": "Improve structure and conclusion.",
-    },
-]
+
+@lru_cache(maxsize=1)
+def load_student_data() -> Dict:
+    return json.loads(STUDENT_DATA_PATH.read_text(encoding="utf-8"))
 
 
 def get_student_profile() -> dict:
-    return STUDENT_PROFILE
+    return load_student_data()["profile"]
 
 
 def get_student_courses() -> list:
-    return STUDENT_COURSES
+    return load_student_data()["courses"]
 
 
 def get_upcoming_exams() -> list:
-    return UPCOMING_EXAMS
+    return load_student_data()["upcoming_exams"]
 
 
 def get_recent_scores() -> list:
-    return RECENT_SCORES
+    return load_student_data()["recent_scores"]
 
 
 def get_student_summary() -> dict:
+    student_data = load_student_data()
+
     return {
-        **STUDENT_PROFILE,
-        "courses": STUDENT_COURSES,
-        "upcoming_exams": UPCOMING_EXAMS,
-        "recent_scores": RECENT_SCORES,
+        **student_data["profile"],
+        "courses": student_data["courses"],
+        "upcoming_exams": student_data["upcoming_exams"],
+        "recent_scores": student_data["recent_scores"],
     }

@@ -1,0 +1,66 @@
+{
+  "profile": {
+    "student_id": "STU-101",
+    "name": "Aarav Sharma",
+    "grade": "8",
+    "school": "Demo Public School",
+    "academic_year": "2026"
+  },
+  "courses": [
+    {
+      "subject": "Mathematics",
+      "teacher": "Ms. Rao",
+      "current_chapter": "Linear Equations",
+      "schedule": "Mon/Wed/Fri"
+    },
+    {
+      "subject": "Science",
+      "teacher": "Mr. Iyer",
+      "current_chapter": "Force and Pressure",
+      "schedule": "Tue/Thu"
+    },
+    {
+      "subject": "English",
+      "teacher": "Ms. Thomas",
+      "current_chapter": "Essay Writing",
+      "schedule": "Mon/Thu"
+    }
+  ],
+  "upcoming_exams": [
+    {
+      "subject": "Mathematics",
+      "date": "2026-06-28",
+      "topic": "Linear Equations",
+      "exam_type": "Unit Test"
+    },
+    {
+      "subject": "Science",
+      "date": "2026-07-02",
+      "topic": "Force and Pressure",
+      "exam_type": "Class Test"
+    }
+  ],
+  "recent_scores": [
+    {
+      "subject": "Mathematics",
+      "assessment": "Class Test 3",
+      "score": 72,
+      "max_score": 100,
+      "teacher_remark": "Needs more practice with word problems."
+    },
+    {
+      "subject": "Science",
+      "assessment": "Worksheet 5",
+      "score": 18,
+      "max_score": 25,
+      "teacher_remark": "Good conceptual understanding, revise definitions."
+    },
+    {
+      "subject": "English",
+      "assessment": "Essay Draft",
+      "score": 15,
+      "max_score": 20,
+      "teacher_remark": "Improve structure and conclusion."
+    }
+  ]
+}

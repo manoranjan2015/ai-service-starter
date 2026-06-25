@@ -583,16 +583,16 @@ There is no user creation flow in this starter project. The app assumes one conf
 Structured student data is stored in:
 
 ```text
-student_service/student_data.py
+student_service/data/student.json
 ```
 
-Update these objects when you want to change the demo student:
+Update these JSON sections when you want to change the demo student:
 
 ```text
-STUDENT_PROFILE   -> student id, name, grade, school, academic year
-STUDENT_COURSES   -> subjects, teachers, current chapters, schedules
-UPCOMING_EXAMS    -> exam dates, topics, exam types
-RECENT_SCORES     -> assessment scores and short teacher remarks
+profile          -> student id, name, grade, school, academic year
+courses          -> subjects, teachers, current chapters, schedules
+upcoming_exams   -> exam dates, topics, exam types
+recent_scores    -> assessment scores and short teacher remarks
 ```
 
 After changing structured data, restart the student service:

@@ -1,9 +1,22 @@
 from fastapi.testclient import TestClient
 
+from student_service.student_data import STUDENT_DATA_PATH, load_student_data
 from student_service.student_data_server import app
 
 
 client = TestClient(app)
+
+
+def test_student_data_loads_from_json_file():
+    assert STUDENT_DATA_PATH.name == "student.json"
+    assert STUDENT_DATA_PATH.exists()
+
+    student_data = load_student_data()
+
+    assert student_data["profile"]["student_id"] == "STU-101"
+    assert student_data["courses"]
+    assert student_data["upcoming_exams"]
+    assert student_data["recent_scores"]
 
 
 def test_student_data_service_health():

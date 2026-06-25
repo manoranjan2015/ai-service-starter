@@ -273,16 +273,16 @@ There is no user creation or student onboarding flow in this starter project. Th
 Structured student records are stored in:
 
 ```text
-student_service/student_data.py
+student_service/data/student.json
 ```
 
 The data is grouped by purpose:
 
 ```text
-STUDENT_PROFILE   -> identity and school metadata
-STUDENT_COURSES   -> subjects, teachers, current chapters, schedules
-UPCOMING_EXAMS    -> exam dates, topics, exam types
-RECENT_SCORES     -> scores, max scores, short remarks
+profile          -> identity and school metadata
+courses          -> subjects, teachers, current chapters, schedules
+upcoming_exams   -> exam dates, topics, exam types
+recent_scores    -> scores, max scores, short remarks
 ```
 
 These records are exposed by the student service and reached by the agent through MCP tools.
