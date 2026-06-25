@@ -199,6 +199,14 @@ Try the chat UI in your browser:
 http://127.0.0.1:8000/ui/chat.html
 ```
 
+How to use the chat UI:
+
+- `Chat` is generated automatically and acts as the memory thread.
+- Click `New` to start a fresh conversation.
+- `Answer style` controls response format: `Simple`, `Detailed`, `Summary`, or `Interview`.
+- Use the sample question buttons to quickly test exam, score, RAG, combined RAG + MCP, and memory follow-up flows.
+- Expand `Response details` under an answer to inspect citations, agent steps, and MCP results.
+
 Or call the chat API directly:
 
 ```bash
@@ -268,7 +276,7 @@ Use these checks after starting the services with Docker or local commands.
 http://127.0.0.1:8000/ui/chat.html
 ```
 
-Use the sample question buttons to test exam, score, RAG, combined RAG + MCP, and memory follow-up flows.
+Use the sample question buttons to test exam, score, RAG, combined RAG + MCP, and memory follow-up flows. The `Chat` value is generated automatically; click `New` when you want to reset memory.
 
 ### 2. Check Services
 
