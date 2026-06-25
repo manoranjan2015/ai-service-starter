@@ -16,7 +16,7 @@ services:
       STUDENT_SERVICE_BASE_URL: http://student-service:8001
       STUDENT_SERVICE_TIMEOUT_SECONDS: 5
     volumes:
-      - ./documents:/app/documents:ro
+      - ./knowledge_base:/app/knowledge_base:ro
     depends_on:
       - student-service
 
@@ -38,7 +38,7 @@ services:
       OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
       PROMPT_VERSION: ${PROMPT_VERSION:-v1}
     volumes:
-      - ./documents:/app/documents:ro
+      - ./knowledge_base:/app/knowledge_base:ro
     depends_on:
       - student-service
     stdin_open: true

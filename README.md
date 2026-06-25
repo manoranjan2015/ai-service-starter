@@ -66,9 +66,9 @@ Agent Orchestrator
   |-- Memory
   |
   |-- Local RAG
-  |     |-- documents/weekly_lessons.md
-  |     |-- documents/teacher_remarks.md
-  |     |-- documents/revision_plan.md
+  |     |-- knowledge_base/weekly_lessons.md
+  |     |-- knowledge_base/teacher_remarks.md
+  |     |-- knowledge_base/revision_plan.md
   |     |-- embeddings
   |     |-- FAISS vector search
   |     |-- reranker
@@ -98,7 +98,7 @@ ai_service/
   llm/            OpenAI model calls
 student_service/  Separate single-student backend service with course/exam/score data
 mcp_service/      MCP server and tools that the agent will use to reach external systems
-documents/        RAG source documents
+knowledge_base/   RAG source files
 ```
 
 Run only one Docker service:
@@ -149,7 +149,7 @@ Already present in the project:
 - MCP server with student data tools
 - MCP client abstraction inside the AI service
 - separate single-student data service
-- sample study tracker RAG documents
+- sample study tracker knowledge base files
 - agent tool trace with MCP results
 - tests
 
@@ -365,7 +365,7 @@ Look for trace steps such as `retrieve_context`, `choose_mcp_tools`, `call_mcp_t
 curl "http://127.0.0.1:8000/rag/search?query=linear%20equations"
 ```
 
-This shows what the local RAG layer retrieves from files in `documents/`.
+This shows what the local RAG layer retrieves from files in `knowledge_base/`.
 
 ## Test
 
@@ -601,17 +601,17 @@ After changing structured data, restart the student service:
 docker compose restart student-service
 ```
 
-Longer unstructured study details belong in RAG documents:
+Longer unstructured study details belong in the knowledge base:
 
 ```text
-documents/weekly_lessons.md
-documents/teacher_remarks.md
-documents/revision_plan.md
+knowledge_base/weekly_lessons.md
+knowledge_base/teacher_remarks.md
+knowledge_base/revision_plan.md
 ```
 
-Use structured data for facts the agent should retrieve through MCP, such as exam dates and scores. Use RAG documents for notes, explanations, lesson summaries, and longer teacher feedback.
+Use structured data for facts the agent should retrieve through MCP, such as exam dates and scores. Use the knowledge base for notes, explanations, lesson summaries, and longer teacher feedback.
 
-If you change RAG documents, restart the AI service with indexing enabled:
+If you change knowledge base files, restart the AI service with indexing enabled:
 
 ```bash
 AUTO_INDEX_ON_STARTUP=true docker compose up --build ai-service
@@ -644,7 +644,7 @@ Implemented:
 - AI-service MCP client abstraction.
 - Agent uses RAG plus MCP student tools.
 - `/chat` calls the agent internally.
-- Study tracker RAG documents.
+- Study tracker knowledge base files.
 
 Next useful improvements:
 

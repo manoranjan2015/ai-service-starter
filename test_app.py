@@ -186,8 +186,8 @@ def test_ai_service_mcp_client_returns_error_for_unknown_tool():
     assert "get_recent_scores" in result["available_tools"]
 
 
-def test_study_tracker_documents_are_loadable():
-    chunks = load_documents("documents")
+def test_study_tracker_knowledge_base_is_loadable():
+    chunks = load_documents("knowledge_base")
 
     assert any("Weekly Lessons for STU-101" in chunk for chunk in chunks)
     assert any("Teacher Remarks for STU-101" in chunk for chunk in chunks)

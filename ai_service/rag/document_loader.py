@@ -66,7 +66,7 @@ def load_document(file_path: str) -> List[str]:
     return []
 
 
-def load_documents(documents_dir: str = "documents") -> List[str]:
+def load_documents(documents_dir: str = "knowledge_base") -> List[str]:
     base_dir = Path(documents_dir)
 
     if not base_dir.exists():

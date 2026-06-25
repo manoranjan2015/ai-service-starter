@@ -142,9 +142,9 @@ Shows short-term memory for a conversation.
 Documents:
 
 ```text
-documents/weekly_lessons.md
-documents/teacher_remarks.md
-documents/revision_plan.md
+knowledge_base/weekly_lessons.md
+knowledge_base/teacher_remarks.md
+knowledge_base/revision_plan.md
 ```
 
 The loader also supports `.txt`, `.xls`, and `.xlsx` files if more source material is added later.
@@ -295,13 +295,13 @@ recent_scores    -> scores, max scores, short remarks
 
 These records are exposed by the student service and reached by the agent through MCP tools.
 
-Longer learning material belongs in RAG documents under:
+Longer learning material belongs in the knowledge base under:
 
 ```text
-documents/
+knowledge_base/
 ```
 
-Use the student service for structured facts. Use RAG documents for lesson notes, longer teacher remarks, revision guidance, and explanatory content.
+Use the student service for structured facts. Use the knowledge base for lesson notes, longer teacher remarks, revision guidance, and explanatory content.
 
 ## 10. AI Service Concepts To Demonstrate
 
@@ -335,7 +335,7 @@ The code implements the core starter-project flow:
 - The MCP server exposes student data tools.
 - The MCP tools call the separate single-student data service.
 - Structured student records are stored in `student_service/data/student.json`.
-- RAG can load Markdown, text, and Excel documents from `documents/`.
+- RAG can load Markdown, text, and Excel files from `knowledge_base/`.
 - Responses include citations, agent steps, and MCP results.
 
 ## 12. Non-Goals
