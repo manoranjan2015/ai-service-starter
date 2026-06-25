@@ -17,7 +17,7 @@ The goal is to show how an AI service evolves from a simple model API into a pra
 The end-user experience should stay simple:
 
 ```text
-User -> POST /chat -> answer
+User -> hosted chat UI or POST /chat -> answer
 ```
 
 The complexity stays inside the backend.
@@ -61,6 +61,9 @@ System behavior:
 Client
   |
   v
+Hosted Chat UI
+  |
+  v
 FastAPI AI Service
   |
   v
@@ -88,6 +91,10 @@ Agent Orchestrator
 ## 5. API Roles
 
 ### 5.1 User-Facing API
+
+`GET /ui/chat.html`
+
+Browser-based static chat UI hosted by the AI service. It calls `/chat`, keeps a generated conversation id for memory, lets users choose an answer style, and exposes response details such as citations, agent steps, and MCP results.
 
 `POST /chat`
 
@@ -320,17 +327,18 @@ The starter project should demonstrate:
 
 The code implements the core starter-project flow:
 
+- `/ui/chat.html` is hosted by the AI service as a lightweight browser UI.
 - `/chat` is the user-facing endpoint and calls the agent internally.
 - `/agent/run` remains available as a demo/debug endpoint with trace details.
 - The agent loads memory, searches RAG, selects MCP student tools, builds a final prompt, calls the model, and saves memory.
 - The MCP server exposes student data tools.
 - The MCP tools call the separate single-student data service.
+- Structured student records are stored in `student_service/data/student.json`.
 - RAG can load Markdown, text, and Excel documents from `documents/`.
 - Responses include citations, agent steps, and MCP results.
 
 ## 12. Non-Goals
 
-- No frontend UI for now.
 - No real school information system.
 - No authentication yet.
 - No persistent database yet.
