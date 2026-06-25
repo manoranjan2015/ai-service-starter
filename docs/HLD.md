@@ -145,8 +145,9 @@ Documents:
 documents/weekly_lessons.md
 documents/teacher_remarks.md
 documents/revision_plan.md
-documents/source.xls
 ```
+
+The loader also supports `.txt`, `.xls`, and `.xlsx` files if more source material is added later.
 
 RAG flow:
 
